@@ -31,6 +31,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(project.dependencies.platform(libs.supabase.bom))
             implementation(libs.supabase.auth)
+            implementation(projects.shared)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
