@@ -19,7 +19,8 @@ Autenticação: `Authorization: Bearer <supabase access_token>` (ver `src/lib/ap
 ## Estrutura
 
 ```
-composeApp/            UI + lógica compartilhada (commonMain) e entry points Android/iOS
+shared/                domain, data, network e presentation (Kotlin puro: JVM + iOS)
+composeApp/            UI Compose (commonMain) e entry points Android/iOS
   src/commonMain/kotlin/com/notura/mobile/
     ui/                telas, componentes reutilizáveis e tema (ui/theme = tokens do Figma)
     domain/            modelos de domínio e regras (sem dependência de Ktor/Compose)
