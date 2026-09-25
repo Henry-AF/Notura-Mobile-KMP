@@ -24,6 +24,7 @@ data class SignUpUiState(
     val isSubmitting: Boolean = false,
     val isGoogleSubmitting: Boolean = false,
     val authFailure: AuthFailure? = null,
+    val failedAction: AuthAction? = null,
     /** Set when Supabase requires e-mail confirmation before the first sign-in. */
     val confirmationSentTo: String? = null,
 ) {
@@ -74,7 +75,7 @@ class SignUpStateHolder(
      */
     fun canStartGoogleSignUp(): Boolean {
         if (mutableState.value.acceptedTerms) return true
-        mutableState.update { it.copy(termsError = FieldError.TermsNotAccepted) }
+        mutableState.update { it.copy(termsError = FieldError.TermsNotAcceptedForGoogle) }
         return false
     }
 
@@ -84,7 +85,7 @@ class SignUpStateHolder(
         mutableState.update { it.copy(isGoogleSubmitting = true, authFailure = null) }
         scope.launch {
             val result = repository.signInWithGoogleIdToken(idToken, nonce)
-            mutableState.update { it.copy(isGoogleSubmitting = false, authFailure = result.failureOrNull()) }
+            mutableState.update { it.copy(isGoogleSubmitting = false, authFailure = result.failureOrNull(), failedAction = result.failedAs(AuthAction.Google)) }
         }
     }
 }
@@ -100,7 +101,7 @@ private fun SignUpUiState.hasFieldErrors(): Boolean =
     nameError != null || emailError != null || passwordError != null || termsError != null
 
 private fun SignUpUiState.afterSignUp(result: AuthResult<SignUpOutcome>): SignUpUiState = when (result) {
-    is AuthResult.Failure -> copy(isSubmitting = false, authFailure = result.failure)
+    is AuthResult.Failure -> copy(isSubmitting = false, authFailure = result.failure, failedAction = AuthAction.Email)
     is AuthResult.Success -> copy(
         isSubmitting = false,
         confirmationSentTo = (result.value as? SignUpOutcome.ConfirmationEmailSent)?.email,

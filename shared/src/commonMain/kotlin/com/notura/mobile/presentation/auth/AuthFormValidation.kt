@@ -13,6 +13,15 @@ enum class FieldError {
     PasswordRequired,
     PasswordTooShort,
     TermsNotAccepted,
+
+    /** Same as [TermsNotAccepted], raised by the Google button; the web words it differently. */
+    TermsNotAcceptedForGoogle,
+}
+
+/** Which button started the request that failed; the web words network failures differently for each. */
+enum class AuthAction {
+    Email,
+    Google,
 }
 
 internal fun validateEmail(email: String): FieldError? {

@@ -105,7 +105,7 @@ class SupabaseAuthRepositoryTest {
 
         val result = auth.repository.signIn("ana@example.com", "wrong")
 
-        assertEquals(AuthResult.Failure(AuthFailure.InvalidCredentials), result)
+        assertEquals(AuthResult.Failure(AuthFailure.InvalidCredentials("Invalid login credentials")), result)
         assertEquals(null, auth.repository.currentAccessToken())
     }
 
@@ -115,7 +115,7 @@ class SupabaseAuthRepositoryTest {
             respondJson(goTrueError(400, "email_not_confirmed", "Email not confirmed"), HttpStatusCode.BadRequest)
         }
 
-        assertEquals(AuthResult.Failure(AuthFailure.EmailNotConfirmed), auth.repository.signIn("ana@example.com", "pw"))
+        assertEquals(AuthResult.Failure(AuthFailure.EmailNotConfirmed("Email not confirmed")), auth.repository.signIn("ana@example.com", "pw"))
     }
 
     @Test
@@ -127,7 +127,7 @@ class SupabaseAuthRepositoryTest {
             )
         }
 
-        assertEquals(AuthResult.Failure(AuthFailure.RateLimited), auth.repository.signIn("ana@example.com", "pw"))
+        assertEquals(AuthResult.Failure(AuthFailure.RateLimited("Request rate limit reached")), auth.repository.signIn("ana@example.com", "pw"))
     }
 
     @Test
@@ -168,7 +168,7 @@ class SupabaseAuthRepositoryTest {
         }
 
         assertEquals(
-            AuthResult.Failure(AuthFailure.EmailAlreadyRegistered),
+            AuthResult.Failure(AuthFailure.EmailAlreadyRegistered("User already registered")),
             auth.repository.signUp("Ana", "ana@example.com", "s3cret-pass"),
         )
     }
@@ -183,7 +183,7 @@ class SupabaseAuthRepositoryTest {
         }
 
         assertEquals(
-            AuthResult.Failure(AuthFailure.WeakPassword(listOf("length"))),
+            AuthResult.Failure(AuthFailure.WeakPassword(listOf("length"), "Password should be at least 8 characters.")),
             auth.repository.signUp("Ana", "ana@example.com", "short"),
         )
     }

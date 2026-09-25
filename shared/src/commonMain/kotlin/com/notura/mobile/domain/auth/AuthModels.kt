@@ -10,22 +10,29 @@ sealed interface AuthSessionState {
     data object SignedOut : AuthSessionState
 }
 
-/** Why a Supabase Auth call failed, reduced to the cases the auth screens handle. */
+/**
+ * Why a Supabase Auth call failed, reduced to the cases the auth screens handle.
+ * [serverMessage] is Supabase's own description (in English), which the web shows as-is.
+ */
 sealed interface AuthFailure {
-    data object InvalidCredentials : AuthFailure
+    val serverMessage: String?
 
-    data object EmailNotConfirmed : AuthFailure
+    data class InvalidCredentials(override val serverMessage: String?) : AuthFailure
 
-    data object EmailAlreadyRegistered : AuthFailure
+    data class EmailNotConfirmed(override val serverMessage: String?) : AuthFailure
 
-    data class WeakPassword(val reasons: List<String>) : AuthFailure
+    data class EmailAlreadyRegistered(override val serverMessage: String?) : AuthFailure
 
-    data object RateLimited : AuthFailure
+    data class WeakPassword(val reasons: List<String>, override val serverMessage: String?) : AuthFailure
 
-    data object Network : AuthFailure
+    data class RateLimited(override val serverMessage: String?) : AuthFailure
 
-    /** Any other Supabase Auth error; [message] is the server's description, in English. */
-    data class Unknown(val message: String?) : AuthFailure
+    data object Network : AuthFailure {
+        override val serverMessage: String? = null
+    }
+
+    /** Any other Supabase Auth error. */
+    data class Unknown(override val serverMessage: String?) : AuthFailure
 }
 
 sealed interface AuthResult<out T> {

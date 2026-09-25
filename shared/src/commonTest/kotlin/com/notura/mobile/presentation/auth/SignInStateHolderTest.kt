@@ -40,6 +40,7 @@ class SignInStateHolderTest {
 
         assertFalse(holder.state.value.isSubmitting)
         assertEquals(null, holder.state.value.authFailure)
+        assertEquals(null, holder.state.value.failedAction)
     }
 
     @Test
@@ -49,11 +50,11 @@ class SignInStateHolderTest {
 
         holder.onSubmit()
         runCurrent()
-        repository.nextSignIn.complete(AuthResult.Failure(AuthFailure.InvalidCredentials))
+        repository.nextSignIn.complete(AuthResult.Failure(AuthFailure.InvalidCredentials("Invalid login credentials")))
         runCurrent()
 
         assertFalse(holder.state.value.isSubmitting)
-        assertEquals(AuthFailure.InvalidCredentials, holder.state.value.authFailure)
+        assertEquals(AuthFailure.InvalidCredentials("Invalid login credentials"), holder.state.value.authFailure)
     }
 
     @Test
@@ -62,7 +63,7 @@ class SignInStateHolderTest {
         holder.fill()
         holder.onSubmit()
         runCurrent()
-        repository.nextSignIn.complete(AuthResult.Failure(AuthFailure.InvalidCredentials))
+        repository.nextSignIn.complete(AuthResult.Failure(AuthFailure.InvalidCredentials("Invalid login credentials")))
         runCurrent()
 
         holder.onPasswordChange("another")
@@ -122,6 +123,7 @@ class SignInStateHolderTest {
 
         assertFalse(holder.state.value.isGoogleSubmitting)
         assertEquals(AuthFailure.Network, holder.state.value.authFailure)
+        assertEquals(AuthAction.Google, holder.state.value.failedAction)
     }
 
     @Test

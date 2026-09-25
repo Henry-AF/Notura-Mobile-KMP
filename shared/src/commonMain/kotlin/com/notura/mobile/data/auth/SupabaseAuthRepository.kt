@@ -105,17 +105,17 @@ private suspend fun <T> runAuth(block: suspend () -> T): AuthResult<T> = try {
 }
 
 internal fun Exception.toAuthFailure(): AuthFailure = when (this) {
-    is AuthWeakPasswordException -> AuthFailure.WeakPassword(reasons)
+    is AuthWeakPasswordException -> AuthFailure.WeakPassword(reasons, errorDescription)
     is AuthRestException -> errorCode.toAuthFailure(errorDescription)
-    is RestException -> if (response.status.value == 429) AuthFailure.RateLimited else AuthFailure.Unknown(description)
+    is RestException -> if (response.status.value == 429) AuthFailure.RateLimited(description) else AuthFailure.Unknown(description)
     is HttpRequestException -> AuthFailure.Network
     else -> AuthFailure.Unknown(message)
 }
 
 private fun AuthErrorCode?.toAuthFailure(description: String): AuthFailure = when (this) {
-    AuthErrorCode.InvalidCredentials -> AuthFailure.InvalidCredentials
-    AuthErrorCode.EmailNotConfirmed -> AuthFailure.EmailNotConfirmed
-    AuthErrorCode.UserAlreadyExists, AuthErrorCode.EmailExists -> AuthFailure.EmailAlreadyRegistered
-    AuthErrorCode.OverRequestRateLimit, AuthErrorCode.OverEmailSendRateLimit -> AuthFailure.RateLimited
+    AuthErrorCode.InvalidCredentials -> AuthFailure.InvalidCredentials(description)
+    AuthErrorCode.EmailNotConfirmed -> AuthFailure.EmailNotConfirmed(description)
+    AuthErrorCode.UserAlreadyExists, AuthErrorCode.EmailExists -> AuthFailure.EmailAlreadyRegistered(description)
+    AuthErrorCode.OverRequestRateLimit, AuthErrorCode.OverEmailSendRateLimit -> AuthFailure.RateLimited(description)
     else -> AuthFailure.Unknown(description)
 }

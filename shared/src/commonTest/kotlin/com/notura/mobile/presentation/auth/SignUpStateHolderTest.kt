@@ -67,11 +67,12 @@ class SignUpStateHolderTest {
 
         holder.onSubmit()
         runCurrent()
-        repository.nextSignUp.complete(AuthResult.Failure(AuthFailure.EmailAlreadyRegistered))
+        repository.nextSignUp.complete(AuthResult.Failure(AuthFailure.EmailAlreadyRegistered("User already registered")))
         runCurrent()
 
         assertFalse(holder.state.value.isSubmitting)
-        assertEquals(AuthFailure.EmailAlreadyRegistered, holder.state.value.authFailure)
+        assertEquals(AuthFailure.EmailAlreadyRegistered("User already registered"), holder.state.value.authFailure)
+        assertEquals(AuthAction.Email, holder.state.value.failedAction)
     }
 
     @Test
@@ -108,7 +109,7 @@ class SignUpStateHolderTest {
         val holder = holder()
 
         assertFalse(holder.canStartGoogleSignUp())
-        assertEquals(FieldError.TermsNotAccepted, holder.state.value.termsError)
+        assertEquals(FieldError.TermsNotAcceptedForGoogle, holder.state.value.termsError)
 
         holder.onGoogleIdToken("id-token", null)
         runCurrent()

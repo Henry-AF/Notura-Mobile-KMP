@@ -19,6 +19,7 @@ data class SignInUiState(
     val isSubmitting: Boolean = false,
     val isGoogleSubmitting: Boolean = false,
     val authFailure: AuthFailure? = null,
+    val failedAction: AuthAction? = null,
 ) {
     val isBusy: Boolean get() = isSubmitting || isGoogleSubmitting
 }
@@ -55,7 +56,7 @@ class SignInStateHolder(
         mutableState.update { it.copy(isSubmitting = true, authFailure = null) }
         scope.launch {
             val result = repository.signIn(current.email, current.password)
-            mutableState.update { it.copy(isSubmitting = false, authFailure = result.failureOrNull()) }
+            mutableState.update { it.copy(isSubmitting = false, authFailure = result.failureOrNull(), failedAction = result.failedAs(AuthAction.Email)) }
         }
     }
 
@@ -65,9 +66,11 @@ class SignInStateHolder(
         mutableState.update { it.copy(isGoogleSubmitting = true, authFailure = null) }
         scope.launch {
             val result = repository.signInWithGoogleIdToken(idToken, nonce)
-            mutableState.update { it.copy(isGoogleSubmitting = false, authFailure = result.failureOrNull()) }
+            mutableState.update { it.copy(isGoogleSubmitting = false, authFailure = result.failureOrNull(), failedAction = result.failedAs(AuthAction.Google)) }
         }
     }
 }
 
 internal fun AuthResult<*>.failureOrNull(): AuthFailure? = (this as? AuthResult.Failure)?.failure
+
+internal fun AuthResult<*>.failedAs(action: AuthAction): AuthAction? = if (this is AuthResult.Failure) action else null
