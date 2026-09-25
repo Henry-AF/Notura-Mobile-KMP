@@ -1,0 +1,30 @@
+# Gradle / Kotlin
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.kotlin/
+local.properties
+*.log
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Xcode / iOS
+iosApp/Pods/
+iosApp/*.xcworkspace/xcuserdata/
+**/xcuserdata/
+DerivedData/
+*.xcuserstate
+iosApp/Configuration/Secrets.xcconfig
+
+# Secrets
+.env
+*.keystore
+*.jks
+
+# OS
+.DS_Store
