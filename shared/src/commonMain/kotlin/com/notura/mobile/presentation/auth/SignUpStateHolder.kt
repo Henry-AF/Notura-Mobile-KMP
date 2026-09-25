@@ -79,6 +79,10 @@ class SignUpStateHolder(
         return false
     }
 
+    /** The platform Google sign-in flow failed before returning an ID token. */
+    fun onGoogleSignInError() =
+        mutableState.update { it.copy(authFailure = AuthFailure.Network, failedAction = AuthAction.Google) }
+
     fun onGoogleIdToken(idToken: String, nonce: String?) {
         val current = mutableState.value
         if (current.isBusy || !current.acceptedTerms) return

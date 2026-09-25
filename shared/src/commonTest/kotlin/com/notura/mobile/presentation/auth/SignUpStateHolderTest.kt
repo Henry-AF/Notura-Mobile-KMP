@@ -123,4 +123,14 @@ class SignUpStateHolderTest {
         assertTrue(holder.state.value.isGoogleSubmitting)
         assertEquals(1, repository.googleCalls.size)
     }
+
+    @Test
+    fun googleFlowErrorShowsGoogleFailure() = runTest {
+        val holder = holder()
+
+        holder.onGoogleSignInError()
+
+        assertEquals(AuthFailure.Network, holder.state.value.authFailure)
+        assertEquals(AuthAction.Google, holder.state.value.failedAction)
+    }
 }

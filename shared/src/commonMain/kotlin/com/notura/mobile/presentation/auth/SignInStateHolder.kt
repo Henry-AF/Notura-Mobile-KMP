@@ -60,6 +60,10 @@ class SignInStateHolder(
         }
     }
 
+    /** The platform Google sign-in flow failed before returning an ID token. */
+    fun onGoogleSignInError() =
+        mutableState.update { it.copy(authFailure = AuthFailure.Network, failedAction = AuthAction.Google) }
+
     /** Called once the platform Google sign-in sheet (Figma 2270:208) returns an ID token. */
     fun onGoogleIdToken(idToken: String, nonce: String?) {
         if (mutableState.value.isBusy) return

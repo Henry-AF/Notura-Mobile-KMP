@@ -134,4 +134,15 @@ class SignInStateHolderTest {
 
         assertTrue(holder.state.value.isPasswordVisible)
     }
+
+    @Test
+    fun googleFlowErrorShowsGoogleFailure() = runTest {
+        val holder = holder()
+
+        holder.onGoogleSignInError()
+
+        assertEquals(AuthFailure.Network, holder.state.value.authFailure)
+        assertEquals(AuthAction.Google, holder.state.value.failedAction)
+        assertEquals(AuthCopy.GOOGLE_CONNECTION_ERROR, AuthCopy.authFailureMessage(AuthFailure.Network, AuthAction.Google))
+    }
 }
